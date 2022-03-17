@@ -21,6 +21,8 @@ public class Panel extends JPanel implements Runnable {
     private ColorModel cm;   
     int scanLine=0;
     int nextScanLine=0;
+    double x_offset=0;
+    double y_offset=0;
 
     public Panel() {
         super(true);
@@ -83,13 +85,16 @@ public class Panel extends JPanel implements Runnable {
         int[] p = pixel; // this avoid crash when resizing
         //a=h/w
         
-        for (int x=0;x<1280;x++) {
-        	for (int y=0;y<720;y++) {
-        		p[y*1280+x]=(0<<16)+(0<<8)+0;
+        for (int x=0;x<width;x++) {
+        	for (int y=0;y<height;y++) {
+        		p[y*width+x]=(0<<16)+(0<<8)+0;
         	}
         }
         
-        FillPolygon(new Point[] {
+        x_offset=50;
+        y_offset=50;
+        
+        FillPolygon(p,Color.BLUE,new Point[] {
         		new Point(135,2),
         		new Point(166,96),
         		new Point(265,97),
@@ -103,7 +108,7 @@ public class Panel extends JPanel implements Runnable {
         });
     }
     
-    public void FillPolygon(Point...points) {
+    public void FillPolygon(int[] p,Color col,Point...points) {
     	Edge[] edges = new Edge[points.length];
     	List<Edge> edges_sorted = new ArrayList<Edge>();
     	for (int i=0;i<points.length;i++) {
@@ -141,7 +146,10 @@ public class Panel extends JPanel implements Runnable {
 	    			Edge e1 = active_edges.get(i);
 	    			Edge e2 = active_edges.get(i+1);
 	    			for (int x=(int)Math.round(e1.x_of_min_y);x<=e2.x_of_min_y;x++) {
-	    				pixel[scanLine*width+x]=(255<<16)+(0<<8)+0;
+	    				int index = (scanLine+(int)y_offset)*width+x+(int)x_offset;
+	    				if (index<p.length&&index>=0) {
+	    					p[index]=col.getColor();
+	    				}
 	    			}
 	    		}
 	    		for (int i=0;i<active_edges.size();i++) {

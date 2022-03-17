@@ -16,6 +16,7 @@ public class PolygonFill {
 		
 		while (true) {
 			p.render();
+            try {Thread.sleep(20);} catch (InterruptedException e) {}
 		}
 	}
 }
