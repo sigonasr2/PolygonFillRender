@@ -15,6 +15,7 @@ public class Panel extends JPanel implements Runnable {
     public int pixel[];
     public int width=1280;
     public int height=720; 
+    final int CIRCLE_PRECISION=32;
     private Thread thread;
     private Image imageBuffer;   
     private MemoryImageSource mImageProducer;   
@@ -95,7 +96,7 @@ public class Panel extends JPanel implements Runnable {
         x_offset+=1;
         y_offset=50;
         
-        /*FillPolygon(p,Color.MAGENTA,new Point[] {
+        FillPolygon(p,Color.WHITE,50,50,new Point[] {
         		new Point(135,2),
         		new Point(166,96),
         		new Point(265,97),
@@ -106,17 +107,62 @@ public class Panel extends JPanel implements Runnable {
         		new Point(84,156),
         		new Point(4,97),
         		new Point(103,96),
-        });*/
-        FillPolygon(p,Color.BRIGHT_CYAN,new Point[] {
+        });
+        FillPolygon(p,Color.BRIGHT_CYAN,x_offset,y_offset,new Point[] {
             	new Point(28,29),
             	new Point(78,103),
             	new Point(120,31),
             	new Point(123,221),
             	new Point(30,218),
             });
+        //FillRect(p,Color.BRIGHT_RED,200,200,600,64);
+        FillCircle(p,Color.BRIGHT_BLUE,150,150,100);
+        FillOval(p,Color.BRIGHT_GREEN,300,150,100,50);
     }
     
-    public void FillPolygon(int[] p,Color col,Point...points) {
+    public void FillRect(int[] p,Color col,double x,double y,double w,double h) {
+    	for (int xx=0;xx<w;xx++) {
+        	for (int yy=0;yy<h;yy++) {
+        		int index = ((int)y+yy)*width+(int)x+xx;
+        		p[index]=col.getColor();
+        	}	
+    	}
+    }
+    
+    public void FillCircle(int[] p,Color col,double center_x,double center_y,double r) {
+    	int counter=0;
+    	Point[] points = new Point[CIRCLE_PRECISION];
+    	for (double theta=0;theta<Math.PI*2;theta+=((Math.PI*2)/CIRCLE_PRECISION)) {
+    		//System.out.println("Loop "+counter+++". Theta:"+theta);
+    		//System.out.println("X:"+(Math.sin(theta)*r+center_x)+" Y:"+(Math.cos(theta)*r+center_y));
+    		points[counter++]=new Point((int)(Math.round(Math.sin(theta)*r+center_x)),(int)(Math.round(Math.cos(theta)*r+center_y)));
+    	}
+        FillPolygon(p,col,center_x,center_y,points);
+    }
+
+    
+    public void FillOval(int[] p,Color col,double center_x,double center_y,double w,double h) {
+    	int counter=0;
+    	Point[] points = new Point[CIRCLE_PRECISION];
+    	double r = Math.max(w,h);
+    	double ratio = Math.min(w,h)/r;
+    	for (double theta=0;theta<Math.PI*2;theta+=((Math.PI*2)/CIRCLE_PRECISION)) {
+    		//System.out.println("Loop "+counter+++". Theta:"+theta);
+    		//System.out.println("X:"+(Math.sin(theta)*r+center_x)+" Y:"+(Math.cos(theta)*r+center_y));
+    		Point newP = new Point((int)(Math.round(Math.sin(theta)*r)),(int)(Math.round(Math.cos(theta)*r)));
+    		if (w<h) {
+    			newP.x=(int)Math.round(newP.x*ratio);
+    		} else {
+    			newP.y=(int)Math.round(newP.y*ratio);
+    		}
+    		newP.x+=center_x;
+    		newP.y+=center_y;
+    		points[counter++]=newP;
+    	}
+        FillPolygon(p,col,center_x,center_y,points);
+    }
+    
+    public void FillPolygon(int[] p,Color col,double x_offset,double y_offset,Point...points) {
     	Edge[] edges = new Edge[points.length];
     	List<Edge> edges_sorted = new ArrayList<Edge>();
     	for (int i=0;i<points.length;i++) {
@@ -220,7 +266,7 @@ public class Panel extends JPanel implements Runnable {
             // request a JPanel re-drawing
             repaint();       
             //System.out.println("Repaint "+frameCount++);
-            try {Thread.sleep(5);} catch (InterruptedException e) {}
+            //try {Thread.sleep(1);} catch (InterruptedException e) {}
         }
 	}
 }
