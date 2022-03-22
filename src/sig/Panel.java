@@ -137,7 +137,7 @@ public class Panel extends JPanel implements Runnable {
     		//System.out.println("X:"+(Math.sin(theta)*r+center_x)+" Y:"+(Math.cos(theta)*r+center_y));
     		points[counter++]=new Point((int)(Math.round(Math.sin(theta)*r+center_x)),(int)(Math.round(Math.cos(theta)*r+center_y)));
     	}
-        FillPolygon(p,col,center_x,center_y,points);
+        FillPolygon(p,col,0,0,points);
     }
 
     
@@ -159,7 +159,7 @@ public class Panel extends JPanel implements Runnable {
     		newP.y+=center_y;
     		points[counter++]=newP;
     	}
-        FillPolygon(p,col,center_x,center_y,points);
+        FillPolygon(p,col,0,0,points);
     }
     
     public void FillPolygon(int[] p,Color col,double x_offset,double y_offset,Point...points) {
