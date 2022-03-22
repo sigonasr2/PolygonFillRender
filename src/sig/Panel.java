@@ -23,6 +23,7 @@ public class Panel extends JPanel implements Runnable {
     int nextScanLine=0;
     double x_offset=0;
     double y_offset=0;
+    int frameCount=0;
 
     public Panel() {
         super(true);
@@ -64,7 +65,7 @@ public class Panel extends JPanel implements Runnable {
         // perform draws on pixels
         render();
         // ask ImageProducer to update image
-        mImageProducer.newPixels();            
+        mImageProducer.newPixels();  
         // draw it on panel          
         g.drawImage(this.imageBuffer, 0, 0, this);  
     }
@@ -91,10 +92,10 @@ public class Panel extends JPanel implements Runnable {
         	}
         }
         
-        x_offset=50;
+        x_offset+=1;
         y_offset=50;
         
-        FillPolygon(p,Color.BLUE,new Point[] {
+        /*FillPolygon(p,Color.MAGENTA,new Point[] {
         		new Point(135,2),
         		new Point(166,96),
         		new Point(265,97),
@@ -105,7 +106,14 @@ public class Panel extends JPanel implements Runnable {
         		new Point(84,156),
         		new Point(4,97),
         		new Point(103,96),
-        });
+        });*/
+        FillPolygon(p,Color.BRIGHT_CYAN,new Point[] {
+            	new Point(28,29),
+            	new Point(78,103),
+            	new Point(120,31),
+            	new Point(123,221),
+            	new Point(30,218),
+            });
     }
     
     public void FillPolygon(int[] p,Color col,Point...points) {
@@ -113,56 +121,68 @@ public class Panel extends JPanel implements Runnable {
     	List<Edge> edges_sorted = new ArrayList<Edge>();
     	for (int i=0;i<points.length;i++) {
     		edges[i] = new Edge(points[i],points[(i+1)%points.length]);
-    		if (edges_sorted.size()==0) {
-    			edges_sorted.add(edges[i]);
-    		} else {
-    			boolean inserted=false;
-    			for (int j=0;j<edges_sorted.size();j++) {
-    				Edge e2 = edges_sorted.get(j);
-    				if (e2.min_y>edges[i].min_y) {
-    					edges_sorted.add(j,edges[i]);
-    					inserted=true;
-    					break;
-    				} else 
-    				if (e2.min_y==edges[i].min_y){
-    					if (e2.min_x>edges[i].min_x) {
-    						edges_sorted.add(j,edges[i]);
-    						inserted=true;
-    						break;
-    					}
-    				}
-    			}
-    			if (!inserted) {
-    				edges_sorted.add(edges[i]);
-    			}
+    		if (!Double.isInfinite(edges[i].inverse_slope)) {
+	    		if (edges_sorted.size()==0) {
+	    			edges_sorted.add(edges[i]);
+	    		} else {
+	    			boolean inserted=false;
+	    			for (int j=0;j<edges_sorted.size();j++) {
+	    				Edge e2 = edges_sorted.get(j);
+	    				if (e2.min_y>=edges[i].min_y) {
+	    					edges_sorted.add(j,edges[i]);
+	    					inserted=true;
+	    					break;
+	    				}
+	    			}
+	    			if (!inserted) {
+	    				edges_sorted.add(edges[i]);
+	    			}
+	    		}
     		}
     	}
+    	//System.out.println(edges_sorted);
     	List<Edge> active_edges = new ArrayList<Edge>();
     	scanLine = edges_sorted.get(0).min_y-1;
     	nextScanLine = scanLine+1;
     	do {
-    		if (active_edges.size()%2==0) {
-	    		for (int i=0;i<active_edges.size();i+=2) {
-	    			Edge e1 = active_edges.get(i);
-	    			Edge e2 = active_edges.get(i+1);
-	    			for (int x=(int)Math.round(e1.x_of_min_y);x<=e2.x_of_min_y;x++) {
-	    				int index = (scanLine+(int)y_offset)*width+x+(int)x_offset;
-	    				if (index<p.length&&index>=0) {
-	    					p[index]=col.getColor();
-	    				}
-	    			}
-	    		}
-	    		for (int i=0;i<active_edges.size();i++) {
-	    			Edge e = active_edges.get(i);
-	    			if (e.max_y==scanLine+1) {
-	    				active_edges.remove(i--);
-	    			} else {
-	    				e.x_of_min_y+=e.inverse_slope;
-	    			}
-	    		}
-	    		scanLine++;
-	    		GetNextScanLineEdges(edges_sorted, active_edges);
+    		for (int i=0;i<active_edges.size();i+=2) {
+    			Edge e1 = active_edges.get(i);
+    			Edge e2 = active_edges.get(i+1);
+				//System.out.println("Drawing from "+((int)Math.round(e1.x_of_min_y))+" to "+e2.x_of_min_y+" on line "+scanLine);
+    			for (int x=(int)Math.round(e1.x_of_min_y);x<=e2.x_of_min_y;x++) {
+    				int index = (scanLine+(int)y_offset)*width+x+(int)x_offset;
+    				if (index<p.length&&index>=0) {
+    					p[index]=col.getColor();
+    				}
+    			}
     		}
+    		List<Edge> new_active_edges = new ArrayList<Edge>();
+    		for (int i=0;i<active_edges.size();i++) {
+    			Edge e = active_edges.get(i);
+    			if (e.max_y==scanLine+1) {
+    				active_edges.remove(i--);
+    			} else {
+    				e.x_of_min_y+=e.inverse_slope;
+    			}
+    		}
+    		scanLine++;
+    		for (int i=0;i<active_edges.size();i++) {
+    			Edge e = active_edges.get(i);
+    			boolean inserted=false;
+    			for (int j=0;j<new_active_edges.size();j++) {
+    				Edge e2 = new_active_edges.get(j);
+    				if (e2.x_of_min_y>e.x_of_min_y) {
+    					new_active_edges.add(j,e);
+    					inserted=true;
+    					break;
+    				}
+    			}
+    			if (!inserted) {
+					new_active_edges.add(e);
+    			}
+    		}
+    		active_edges=new_active_edges;
+    		GetNextScanLineEdges(edges_sorted, active_edges);
     	}
     	while (active_edges.size()>0);
     }
@@ -198,7 +218,8 @@ public class Panel extends JPanel implements Runnable {
 	public void run() {
 		while (true) {
             // request a JPanel re-drawing
-            repaint();                                  
+            repaint();       
+            //System.out.println("Repaint "+frameCount++);
             try {Thread.sleep(5);} catch (InterruptedException e) {}
         }
 	}

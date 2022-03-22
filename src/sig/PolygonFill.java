@@ -14,9 +14,7 @@ public class PolygonFill {
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
 		
-		while (true) {
-			p.render();
-            try {Thread.sleep(20);} catch (InterruptedException e) {}
-		}
+		int i=0;
+		p.render();
 	}
 }

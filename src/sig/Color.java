@@ -28,6 +28,6 @@ public class Color {
 	}
 	
 	public int getColor() {
-		return (r<<16)+(g<<16)+b;
+		return (r<<16)+(g<<8)+b;
 	}
 }
