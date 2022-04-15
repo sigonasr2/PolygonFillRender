@@ -3,9 +3,10 @@ package sig;
 import javax.swing.JFrame;
 
 public class PolygonFill {
+	public static final String PROGRAM_NAME="Polygon Fill Renderer";
 	public static void main(String[] args) {
-		Panel p = new Panel();
-		JFrame f = new JFrame("Polygon Fill Renderer");
+		JFrame f = new JFrame(PROGRAM_NAME);
+		Panel p = new Panel(f);
 		
 		p.init();
 		
@@ -14,7 +15,6 @@ public class PolygonFill {
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
 		
-		int i=0;
 		p.render();
 	}
 }

@@ -9,13 +9,16 @@ import java.awt.image.MemoryImageSource;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Panel extends JPanel implements Runnable {
+	JFrame window;
     public int pixel[];
     public int width=1280;
     public int height=720; 
     final int CIRCLE_PRECISION=32;
+	final int OUTLINE_COL=Color.BRIGHT_WHITE.getColor();
     private Thread thread;
     private Image imageBuffer;   
     private MemoryImageSource mImageProducer;   
@@ -25,9 +28,12 @@ public class Panel extends JPanel implements Runnable {
     double x_offset=0;
     double y_offset=0;
     int frameCount=0;
+	long lastSecond=0;
+	int lastFrameCount=0;
 
-    public Panel() {
+    public Panel(JFrame f) {
         super(true);
+		this.window=f;
         thread = new Thread(this, "MyPanel Thread");
     }
 
@@ -69,6 +75,14 @@ public class Panel extends JPanel implements Runnable {
         mImageProducer.newPixels();  
         // draw it on panel          
         g.drawImage(this.imageBuffer, 0, 0, this);  
+		
+		
+		if (window!=null&&System.currentTimeMillis()-lastSecond>=1000) {
+			window.setTitle(PolygonFill.PROGRAM_NAME+" - FPS: "+(frameCount-lastFrameCount));
+			lastFrameCount=frameCount;
+			lastSecond=System.currentTimeMillis();
+		}
+		frameCount++;
     }
     
     /**
@@ -200,7 +214,7 @@ public class Panel extends JPanel implements Runnable {
     				int index = (scanLine+(int)y_offset)*width+x+(int)x_offset;
     				if (index<p.length&&index>=0) {
 						Draw(p,index,col.getColor());
-    				}
+					}
     			}
     		}
     		List<Edge> new_active_edges = new ArrayList<Edge>();
