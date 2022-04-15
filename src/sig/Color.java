@@ -1,7 +1,7 @@
 package sig;
 
 public class Color {
-	int r,g,b;
+	int r,g,b,a;
 	
 	final static public Color BLACK = new Color(0,0,0);
 	final static public Color RED = new Color(204,0,0);
@@ -21,13 +21,18 @@ public class Color {
 	final static public Color BRIGHT_WHITE = new Color(255,255,255);
 
 	public Color(int r, int g, int b) {
+		this(r,g,b,255);
+	}
+
+	public Color(int r, int g, int b,int a) {
 		super();
 		this.r = r;
 		this.g = g;
 		this.b = b;
+		this.a = a;
 	}
 	
 	public int getColor() {
-		return (r<<16)+(g<<8)+b;
+		return (a<<24)+(r<<16)+(g<<8)+b;
 	}
 }

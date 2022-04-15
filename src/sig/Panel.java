@@ -116,7 +116,8 @@ public class Panel extends JPanel implements Runnable {
             	new Point(30,218),
             });
         //FillRect(p,Color.BRIGHT_RED,200,200,600,64);
-        FillCircle(p,Color.BRIGHT_BLUE,150,150,100);
+		final Color testAlpha = new Color(150,0,0,128);
+        FillCircle(p,testAlpha,150,150,100);
         FillOval(p,Color.BRIGHT_GREEN,300,150,100,50);
     }
     
@@ -198,7 +199,7 @@ public class Panel extends JPanel implements Runnable {
     			for (int x=(int)Math.round(e1.x_of_min_y);x<=e2.x_of_min_y;x++) {
     				int index = (scanLine+(int)y_offset)*width+x+(int)x_offset;
     				if (index<p.length&&index>=0) {
-    					p[index]=col.getColor();
+						Draw(p,index,col.getColor());
     				}
     			}
     		}
@@ -258,6 +259,31 @@ public class Panel extends JPanel implements Runnable {
 	    		}
 	    	}
     	}
+	}
+
+	public void Draw(int[] canvas,int index, int col) {
+		int alpha = col>>>24;
+		if (alpha==0) {
+			return;}
+		 else
+		if (alpha==255) {
+			canvas[index]=col;
+		} else {
+			float ratio=alpha/255f;
+			int prev_col=canvas[index];
+			int prev_r=(prev_col&0xFF);
+			int prev_g=(prev_col&0xFF00)>>>8;
+			int prev_b=(prev_col&0xFF0000)>>>16;
+			int r=(col&0xFF);
+			int g=(col&0xFF00)>>>8;
+			int b=(col&0xFF0000)>>>16;
+
+			int new_r=(int)(ratio*r+(1-ratio)*prev_r);
+			int new_g=(int)(ratio*g+(1-ratio)*prev_g);
+			int new_b=(int)(ratio*b+(1-ratio)*prev_b);
+			
+			canvas[index]=new_r+(new_g<<8)+(new_b<<16)+(col&0xFF000000);
+		}
 	}
 
 	@Override
