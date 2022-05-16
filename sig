@@ -11,10 +11,10 @@ if [ -z "$1" ]
     echo ""
     printf "====\tCurrent Configuration"
     printf "\t====================="
-    printf "\n\tPROJECT_NAME\t${PROJECT_NAME}"
-    printf "\n\tPROJECT_DIR\t${PROJECT_DIR}"
-    printf "\n\tMAIN_CLASS\t${MAIN_CLASS}"
-    printf "\n\tOUT_DIR\t\t${OUT_DIR}"
+    printf "\n\t%-15s%20s" PROJECT_NAME ${PROJECT_NAME}
+    printf "\n\t%-15s%20s" PROJECT_DIR ${PROJECT_DIR}
+    printf "\n\t%-15s%20s" MAIN_CLASS ${MAIN_CLASS}
+    printf "\n\t%-15s%20s" OUT_DIR ${OUT_DIR}
     printf "\n====================================================="
     echo ""
     echo ""
