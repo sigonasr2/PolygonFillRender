@@ -9,6 +9,9 @@ if [ -z "$1" ]
     echo ""
     echo "  Usage: ./sig <command> {args}"
     echo ""
+    printf "\tCurrent Configuration"
+    echo ""
+    echo ""
     echo "  Command List:"
     ls -1 ./scripts | sed -e 's/\.sh$//' | sed -e 's/^/    /'
     echo ""
