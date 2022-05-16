@@ -1,15 +1,15 @@
-PROGRAM_NAME="PolygonFill"
 MAIN_CLASS="sig.PolygonFill"
 
 rm -Rf bin/*
-javac -Xlint:unchecked -cp src -d bin src/sig/${PROGRAM_NAME}.java
+javac -Xlint:unchecked -cp src -d bin ${PROJECT_DIR}/${PROJECT_NAME}.java
 printf "\n\n\nGenerating Manifest...\n\n"
 touch manifest
 echo "Main-Class: ${MAIN_CLASS}" >> manifest
 printf "\n\n\nCreating Jar...\n\n"
-cd bin
-jar cfm ${PROGRAM_NAME}.jar ../manifest sig
+cd ${OUT_DIR}
+jar cfm ${PROJECT_NAME}.jar ../manifest sig
 printf "\n\n\nRunning Program...\n\n"
-java -jar ${PROGRAM_NAME}.jar
+java -jar ${PROJECT_NAME}.jar
+mv ${PROJECT_NAME}.jar ..
 cd ..
-./clean
+./scripts/clean.sh
